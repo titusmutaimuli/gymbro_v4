@@ -1,0 +1,1623 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GYMBRO - Fitness Portal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Courier New', monospace;
+        }
+        .window {
+            transition: all 0.4s ease;
+        }
+        .window.hidden {
+            opacity: 0;
+            transform: translateX(20px);
+            pointer-events: none;
+        }
+        .window.active {
+            opacity: 1;
+            transform: translateX(0);
+        }
+        .fitness-icon {
+            background: linear-gradient(135deg, #3730a3, #312e81);
+        }
+        .tab-active {
+            background-color: #3730a3;
+            color: white;
+        }
+        .user-message {
+            background-color: #dbeafe;
+            margin-left: 20%;
+            border-left: 4px solid #dc2626;
+        }
+        .other-message {
+            background-color: #f3f4f6;
+            margin-right: 20%;
+            border-right: 4px solid #6b7280;
+        }
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(220, 38, 38, 0.3);
+        }
+        .content-glass {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(220, 38, 38, 0.2);
+        }
+        .red-accent {
+            box-shadow: 0 0 15px rgba(220, 38, 38, 0.2);
+        }
+        .leader-top {
+            background: linear-gradient(135deg, #dc2626, #b91c1c);
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-indigo-950 to-slate-950 min-h-screen flex items-center justify-center p-4">
+    <!-- Window 1: Welcome -->
+    <div id="window1" class="window active glass-effect rounded-xl shadow-xl max-w-4xl w-full flex flex-col md:flex-row overflow-hidden">
+        <div class="md:w-1/2 p-8 flex flex-col justify-center content-glass rounded-lg m-4">
+            <h1 class="text-4xl font-bold text-white mb-6">GYMBRO</h1>
+            <p class="text-indigo-200 mb-8">Your fitness journey starts here. Track, improve, and connect.</p>
+            
+            <div class="space-y-4">
+                <button onclick="showWindow('window2', 'Log In')" class="red-accent w-full bg-stone-600 hover:bg-stone-700 text-white font-semibold py-3 rounded-lg transition duration-300 shadow-md">
+                    Log In
+                </button>
+                <button onclick="showWindow('window2', 'Join')" class="red-accent w-full bg-indigo-700 hover:bg-indigo-800 text-white font-semibold py-3 rounded-lg transition duration-300 shadow-md">
+                    Join
+                </button>
+            </div>
+        </div>
+        
+        <div class="md:w-1/2 bg-indigo-900/70 flex items-center justify-center p-8 m-4 rounded-lg">
+            <div class="text-center text-white">
+                <div class="fitness-icon w-32 h-32 mx-auto mb-6 rounded-full flex items-center justify-center shadow-lg">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                    </svg>
+                </div>
+                <h2 class="text-xl font-bold">Transform Your Body</h2>
+                <p class="text-indigo-200 mt-2">Start your journey with GYMBRO today</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Window 2: Login/Join -->
+    <div id="window2" class="window hidden glass-effect rounded-xl shadow-xl max-w-4xl w-full flex flex-col md:flex-row overflow-hidden">
+        <div class="md:w-1/2 p-8 flex flex-col justify-center content-glass rounded-lg m-4">
+            <h1 id="formTitle" class="text-3xl font-bold text-white mb-6">Log In</h1>
+            
+            <div class="space-y-4">
+                <div>
+                    <input id="usernameInput" type="text" placeholder="Username" class="w-full px-4 py-3 border border-red-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white">
+                </div>
+                <div>
+                    <input id="passwordInput" type="password" placeholder="Password" class="w-full px-4 py-3 border border-red-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white">
+                </div>
+                
+                <div id="message" class="text-sm min-h-5"></div>
+                
+                <button id="actionBtn" onclick="handleAuth()" class="red-accent w-full bg-stone-600 hover:bg-stone-700 text-white font-semibold py-3 rounded-lg transition duration-300 shadow-md">
+                    Log In
+                </button>
+                
+                <button onclick="showWindow('window1')" class="red-accent w-full bg-indigo-200 hover:bg-indigo-300 text-indigo-800 py-3 rounded-lg transition duration-300">
+                    Back to Welcome
+                </button>
+            </div>
+        </div>
+        
+        <div class="md:w-1/2 bg-indigo-900/70 flex items-center justify-center p-8 m-4 rounded-lg">
+            <div class="text-center text-white">
+                <div class="fitness-icon w-32 h-32 mx-auto mb-6 rounded-full flex items-center justify-center shadow-lg">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                    </svg>
+                </div>
+                <h2 class="text-xl font-bold">Your Data is Secure</h2>
+                <p class="text-indigo-200 mt-2">We protect your fitness journey</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Window 3: Create Routine -->
+    <div id="window3" class="window hidden glass-effect rounded-xl shadow-xl max-w-6xl w-full overflow-hidden">
+        <!-- Tab Navigation -->
+        <div class="bg-indigo-800/80 p-4 border-b border-red-600">
+            <div class="flex space-x-2 overflow-x-auto">
+                <button class="tab-btn px-4 py-2 rounded-lg bg-indigo-700 text-white font-semibold" data-day="Mon">Mon</button>
+                <button class="tab-btn px-4 py-2 rounded-lg bg-gray-300 text-gray-700 font-semibold" data-day="Tue">Tue</button>
+                <button class="tab-btn px-4 py-2 rounded-lg bg-gray-300 text-gray-700 font-semibold" data-day="Wed">Wed</button>
+                <button class="tab-btn px-4 py-2 rounded-lg bg-gray-300 text-gray-700 font-semibold" data-day="Thu">Thu</button>
+                <button class="tab-btn px-4 py-2 rounded-lg bg-gray-300 text-gray-700 font-semibold" data-day="Fri">Fri</button>
+                <button class="tab-btn px-4 py-2 rounded-lg bg-gray-300 text-gray-700 font-semibold" data-day="Sat">Sat</button>
+                <button class="tab-btn px-4 py-2 rounded-lg bg-gray-300 text-gray-700 font-semibold" data-day="Sun">Sun</button>
+                <button class="tab-btn px-4 py-2 rounded-lg bg-gray-300 text-gray-700 font-semibold" data-day="Notes">Notes</button>
+            </div>
+        </div>
+
+        <!-- Content Area -->
+        <div class="p-6">
+            <!-- Workout Day Content -->
+            <div id="workout-content" class="space-y-6">
+                <h2 id="day-title" class="text-2xl font-bold text-white">Monday Workout!</h2>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Input Section -->
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-white mb-1">Body Part</label>
+                            <input type="text" id="bodyPartInput" placeholder="e.g., Abs, Chest, Legs" 
+                                   class="w-full px-3 py-2 border border-red-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-white mb-1">Workout Details</label>
+                            <input type="text" id="workoutDetailsInput" placeholder="e.g., 3 sets of 15 reps" 
+                                   class="w-full px-3 py-2 border border-red-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-white mb-1">Time</label>
+                            <select id="timeSelect" class="w-full px-3 py-2 border border-red-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white">
+                                <!-- Time options will be populated by JavaScript -->
+                            </select>
+                        </div>
+                        
+                        <div class="flex space-x-3">
+                            <button onclick="addWorkout()" class="flex-1 bg-stone-600 hover:bg-stone-700 text-white font-semibold py-2 rounded-lg transition duration-300 red-accent">
+                                Add Workout
+                            </button>
+                            <button onclick="removeWorkout()" class="red-accent flex-1 bg-indigo-700 hover:bg-indigo-800 text-white font-semibold py-2 rounded-lg transition duration-300">
+                                Remove Workout
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Workout List Section -->
+                    <div class="space-y-4">
+                        <label class="block text-sm font-medium text-white">Workouts List</label>
+                        <div id="workoutsList" class="border border-red-300 rounded-lg h-48 overflow-y-auto p-3 bg-white">
+                            <div class="text-indigo-500 text-center py-8">No workouts added yet</div>
+                        </div>
+                        
+                        <div class="flex items-center space-x-2">
+                            <input type="checkbox" id="workoutsCheckbox" disabled 
+                                   class="w-4 h-4 text-indigo-600 bg-indigo-100 border-red-300 rounded focus:ring-indigo-500">
+                            <label class="text-sm text-white">Workouts added (auto-checked)</label>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="flex flex-col md:flex-row gap-2 md:gap-3 pt-4">
+                    <button onclick="showWindow('window1')" class="red-accent px-6 py-2 bg-indigo-700 hover:bg-indigo-800 text-white rounded-lg transition duration-300">
+                        Back to Welcome
+                    </button>
+                    <button onclick="goToHome()" class="px-6 py-2 bg-stone-600 hover:bg-stone-700 text-white rounded-lg transition duration-300 red-accent">
+                        Continue to Home
+                    </button>
+                    <button onclick="saveRoutine()" class="red-accent px-6 py-2 bg-indigo-700 hover:bg-indigo-800 text-white rounded-lg transition duration-300">
+                        Save Routine
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Notes Content -->
+            <div id="notes-content" class="hidden space-y-4">
+                <h2 class="text-2xl font-bold text-white">Workout Notes</h2>
+                <textarea id="notes-textarea" placeholder="Add your workout notes, goals, or reminders here..." 
+                          class="w-full h-64 px-3 py-2 border border-red-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white"></textarea>
+                <button onclick="saveNotes()" class="red-accent px-6 py-2 bg-indigo-700 hover:bg-indigo-800 text-white rounded-lg transition duration-300">
+                    Save Notes
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Window 4: COMPLETE REWORK using proper responsive patterns -->
+    <div id="window4" class="window hidden glass-effect rounded-xl shadow-xl max-w-7xl w-full h-auto md:h-[600px] overflow-hidden">
+        <!-- Mobile: Stack vertically, Desktop: Sidebar left, content right -->
+        <div class="h-full flex flex-col md:flex-row">
+            <!-- Sidebar - Top on mobile, Left on desktop -->
+            <div class="md:w-64 w-full bg-indigo-800/80 text-white p-4 border-b md:border-b-0 md:border-r border-red-600">
+                <div class="mb-4">
+                    <h2 class="text-xl font-bold">GYMBRO</h2>
+                    <p class="text-indigo-200 text-sm" id="sidebar-username">Welcome</p>
+                </div>
+                
+                <!-- Mobile: Horizontal scrollable tabs, Desktop: Vertical list -->
+                <div class="flex md:flex-col overflow-x-auto md:overflow-visible space-x-2 md:space-x-0 md:space-y-2 pb-2 md:pb-0">
+                    <button class="sidebar-tab whitespace-nowrap px-4 py-2 rounded-lg bg-indigo-700 font-semibold text-sm" data-tab="chat">
+                        💬 Chat
+                    </button>
+                    <button class="sidebar-tab whitespace-nowrap px-4 py-2 rounded-lg bg-indigo-900 hover:bg-indigo-700 font-semibold text-sm" data-tab="groups">
+                        👥 Groups
+                    </button>
+                    <button class="sidebar-tab whitespace-nowrap px-4 py-2 rounded-lg bg-indigo-900 hover:bg-indigo-700 font-semibold text-sm" data-tab="workout">
+                        💪 Today's Workout
+                    </button>
+                    <button class="sidebar-tab whitespace-nowrap px-4 py-2 rounded-lg bg-indigo-900 hover:bg-indigo-700 font-semibold text-sm" data-tab="routine">
+                        📅 Routine
+                    </button>
+                    <button class="sidebar-tab whitespace-nowrap px-4 py-2 rounded-lg bg-indigo-900 hover:bg-indigo-700 font-semibold text-sm" data-tab="notes">
+                        📝 Notes
+                    </button>
+                </div>
+                
+                <button onclick="signOut()" class="mt-4 w-full bg-stone-600 hover:bg-stone-700 text-white py-2 rounded-lg transition duration-300 red-accent text-sm">
+                    Sign Out
+                </button>
+            </div>
+
+            <!-- Main Content Area - Takes remaining space -->
+            <div class="flex-1 flex flex-col min-h-0">
+                <!-- Top Bar -->
+                <div class="bg-indigo-900/30 px-4 py-3 border-b border-red-600">
+                    <h1 id="current-tab-title" class="text-lg font-bold text-white">Chat</h1>
+                </div>
+
+                <!-- Content Area - Scrollable on both mobile and desktop -->
+                <div class="flex-1 flex flex-col md:flex-row overflow-hidden">
+                    <!-- Main Chat/Content Area -->
+                    <div class="flex-1 flex flex-col p-4 min-h-0">
+                        <!-- Chat Controls -->
+                        <div id="chat-controls" class="mb-3 flex flex-col sm:flex-row sm:items-center gap-2 hidden">
+                            <label class="text-sm font-medium text-white">Chat:</label>
+                            <select id="chat-target" class="flex-1 px-3 py-2 border border-red-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white text-sm">
+                                <option value="all">Global Chat</option>
+                            </select>
+                        </div>
+
+                        <!-- Scrollable Content Area -->
+                        <div id="content-scroll" class="flex-1 border border-red-600 rounded-lg overflow-y-auto p-3 bg-indigo-900/20 mb-3 min-h-[200px]">
+                            <!-- Content loaded here -->
+                        </div>
+
+                        <!-- Dynamic Input Area -->
+                        <div id="dynamic-input" class="flex flex-col sm:flex-row gap-2">
+                            <!-- Inputs loaded here -->
+                        </div>
+                    </div>
+
+                    <!-- Right Panel - Bottom on mobile, Right on desktop -->
+                    <div class="md:w-80 w-full bg-indigo-900/20 p-4 border-t md:border-t-0 md:border-l border-red-600">
+                        <h3 class="text-base font-bold text-white mb-3">Next Workout</h3>
+                        <div id="countdown-timer" class="text-center p-3 bg-indigo-800/30 rounded-lg shadow border border-red-600 mb-3">
+                            <div class="flex justify-around">
+                                <div>
+                                    <div class="text-xl font-bold text-white" id="countdown-days">2</div>
+                                    <div class="text-xs text-indigo-200">days</div>
+                                </div>
+                                <div>
+                                    <div class="text-xl font-bold text-white" id="countdown-hours">14</div>
+                                    <div class="text-xs text-indigo-200">hours</div>
+                                </div>
+                                <div>
+                                    <div class="text-xl font-bold text-white" id="countdown-minutes">35</div>
+                                    <div class="text-xs text-indigo-200">minutes</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-sm font-semibold text-white" id="next-workout-name">3 sets Chinups</div>
+                            <div class="text-xs text-indigo-200" id="workout-time">Tuesday at 07:00</div>
+                        </div>
+                        <div class="mt-4 text-center text-xs text-indigo-200" id="current-date">
+                            Monday, January 15, 2024
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Bottom Username -->
+                <div class="bg-indigo-900/30 px-4 py-2 border-t border-red-600">
+                    <div class="text-xs text-indigo-200" id="bottom-username">Logged in as: Dave</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        // Firebase configuration and initialization
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getFirestore, doc, setDoc, getDoc, updateDoc, arrayUnion, arrayRemove, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        // Firebase Configuration - In production, use environment variables
+        const firebaseConfig = {
+            apiKey: "AIzaSyCXB0z0FAebrzhMm8HZk6TJ6njjF923gzs",
+            authDomain: "gymbrov1-726dd.firebaseapp.com",
+            projectId: "gymbrov1-726dd",
+            storageBucket: "gymbrov1-726dd.firebasestorage.app",
+            messagingSenderId: "784523892834",
+            appId: "1:784523892834:web:4790015b7a6aec0e7f593b",
+            measurementId: "G-CCEQLN6G6E"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);       
+        
+        // Firebase Database Functions
+        window.firebaseDB = {
+            // Authentication
+            async loginUser(username, password) {
+                try {
+                    const userDoc = await getDoc(doc(db, "users", username));
+                    
+                    if (userDoc.exists()) {
+                        const userData = userDoc.data();
+                        if (userData.pass === password) {
+                            return { success: true, user: userData, username: username };
+                        } else {
+                            return { success: false, error: "Invalid password" };
+                        }
+                    } else {
+                        return { success: false, error: "User not found" };
+                    }
+                } catch (error) {
+                    console.error("Login error:", error);
+                    return { success: false, error: "Authentication failed" };
+                }
+            },
+            
+            async registerUser(username, password) {
+                try {
+                    const userDoc = await getDoc(doc(db, "users", username));
+                    
+                    if (userDoc.exists()) {
+                        return { success: false, error: "Username already exists" };
+                    }
+                    
+                    const newUser = {
+                        pass: password,
+                        groups: [],
+                        chatPreferences: { defaultGroup: "all" },
+                        notes: "",
+                        routine: {},
+                        workoutHistory: {},
+                        stats: {
+                            totalWorkouts: 0,
+                            currentStreak: 0,
+                            longestStreak: 0
+                        }
+                    };
+                    
+                    await setDoc(doc(db, "users", username), newUser);
+                    return { success: true, user: newUser, username: username };
+                    
+                } catch (error) {
+                    console.error("Registration error:", error);
+                    return { success: false, error: "Registration failed" };
+                }
+            },
+
+            // User Data Operations
+            async getUserData(username) {
+                try {
+                    const userDoc = await getDoc(doc(db, "users", username));
+                    return userDoc.exists() ? userDoc.data() : null;
+                } catch (error) {
+                    console.error("Error getting user data:", error);
+                    return null;
+                }
+            },
+
+            async updateUserNotes(username, notes) {
+                try {
+                    await updateDoc(doc(db, "users", username), { notes });
+                    return { success: true };
+                } catch (error) {
+                    console.error("Error updating notes:", error);
+                    return { success: false, error: "Failed to save notes" };
+                }
+            },
+
+            async saveUserRoutine(username, routine) {
+                try {
+                    await updateDoc(doc(db, "users", username), { routine });
+                    return { success: true };
+                } catch (error) {
+                    console.error("Error saving routine:", error);
+                    return { success: false, error: "Failed to save routine" };
+                }
+            },
+
+            async markWorkoutComplete(username, workoutData) {
+                try {
+                    const today = new Date().toISOString().split('T')[0];
+                    const userRef = doc(db, "users", username);
+                    
+                    // Get current user data to calculate streaks
+                    const userDoc = await getDoc(userRef);
+                    const userData = userDoc.data();
+                    const yesterday = new Date();
+                    yesterday.setDate(yesterday.getDate() - 1);
+                    const yesterdayStr = yesterday.toISOString().split('T')[0];
+                    
+                    const wasCompletedYesterday = userData.workoutHistory?.[yesterdayStr]?.completed || false;
+                    const newStreak = wasCompletedYesterday ? (userData.stats.currentStreak || 0) + 1 : 1;
+                    const longestStreak = Math.max(newStreak, userData.stats.longestStreak || 0);
+                    
+                    await updateDoc(userRef, {
+                        [`workoutHistory.${today}`]: workoutData,
+                        "stats.totalWorkouts": (userData.stats.totalWorkouts || 0) + 1,
+                        "stats.currentStreak": newStreak,
+                        "stats.longestStreak": longestStreak
+                    });
+                    return { success: true };
+                } catch (error) {
+                    console.error("Error marking workout complete:", error);
+                    return { success: false, error: "Failed to save workout" };
+                }
+            },
+
+            // Group Operations
+            async getGroupData(groupName) {
+                try {
+                    const groupDoc = await getDoc(doc(db, "groups", groupName));
+                    return groupDoc.exists() ? groupDoc.data() : null;
+                } catch (error) {
+                    console.error("Error getting group data:", error);
+                    return null;
+                }
+            },
+
+            async createGroup(username, groupName) {
+                try {
+                    // Check if group already exists
+                    const groupDoc = await getDoc(doc(db, "groups", groupName));
+                    if (groupDoc.exists()) {
+                        return { success: false, error: "Group already exists" };
+                    }
+                    
+                    // Create the group
+                    await setDoc(doc(db, "groups", groupName), {
+                        name: groupName,
+                        members: [username],
+                        createdBy: username,
+                        createdAt: new Date().toISOString(),
+                        groupChat: []
+                    });
+                    
+                    // Add group to user's groups
+                    const userRef = doc(db, "users", username);
+                    await updateDoc(userRef, {
+                        groups: arrayUnion(groupName)
+                    });
+                    
+                    return { success: true };
+                } catch (error) {
+                    console.error("Error creating group:", error);
+                    return { success: false, error: "Failed to create group" };
+                }
+            },
+
+            async joinGroup(username, groupName) {
+                try {
+                    // Check if group exists
+                    const groupDoc = await getDoc(doc(db, "groups", groupName));
+                    if (!groupDoc.exists()) {
+                        return { success: false, error: "Group does not exist" };
+                    }
+                    
+                    // Add user to group members
+                    const groupRef = doc(db, "groups", groupName);
+                    await updateDoc(groupRef, {
+                        members: arrayUnion(username)
+                    });
+                    
+                    // Add group to user's groups
+                    const userRef = doc(db, "users", username);
+                    await updateDoc(userRef, {
+                        groups: arrayUnion(groupName)
+                    });
+                    
+                    return { success: true };
+                } catch (error) {
+                    console.error("Error joining group:", error);
+                    return { success: false, error: "Failed to join group" };
+                }
+            },
+
+            async leaveGroup(username, groupName) {
+                try {
+                    // Remove user from group members
+                    const groupRef = doc(db, "groups", groupName);
+                    await updateDoc(groupRef, {
+                        members: arrayRemove(username)
+                    });
+                    
+                    // Remove group from user's groups
+                    const userRef = doc(db, "users", username);
+                    await updateDoc(userRef, {
+                        groups: arrayRemove(groupName)
+                    });
+                    
+                    return { success: true };
+                } catch (error) {
+                    console.error("Error leaving group:", error);
+                    return { success: false, error: "Failed to leave group" };
+                }
+            },
+
+            // Chat Operations
+            async sendMessage(username, message, target) {
+                try {
+                    const messageData = {
+                        username,
+                        message,
+                        target,
+                        timestamp: new Date().toISOString()
+                    };
+
+                    if (target === "all") {
+                        // Global chat
+                        const globalRef = doc(db, "globalChat", "main");
+                        const globalDoc = await getDoc(globalRef);
+                        
+                        if (globalDoc.exists()) {
+                            await updateDoc(globalRef, {
+                                messages: arrayUnion(messageData)
+                            });
+                        } else {
+                            await setDoc(globalRef, {
+                                messages: [messageData]
+                            });
+                        }
+                    } else {
+                        // Group chat
+                        const groupRef = doc(db, "groups", target);
+                        await updateDoc(groupRef, {
+                            groupChat: arrayUnion(messageData)
+                        });
+                    }
+                    return { success: true };
+                } catch (error) {
+                    console.error("Error sending message:", error);
+                    return { success: false, error: "Failed to send message" };
+                }
+            },
+
+            async getChatMessages(target, userGroups = []) {
+                try {
+                    if (target === "all") {
+                        const globalDoc = await getDoc(doc(db, "globalChat", "main"));
+                        const messages = globalDoc.exists() ? (globalDoc.data().messages || []) : [];
+                        // For global chat, show all messages (no filtering needed)
+                        return messages;
+                    } else {
+                        // For group chat, only get messages if user is in that group
+                        if (!userGroups.includes(target)) {
+                            console.log(`User not in group ${target}, no messages shown`);
+                            return [];
+                        }
+                        
+                        const groupDoc = await getDoc(doc(db, "groups", target));
+                        return groupDoc.exists() ? (groupDoc.data().groupChat || []) : [];
+                    }
+                } catch (error) {
+                    console.error("Error getting messages:", error);
+                    return [];
+                }
+            },
+
+            // Get multiple users data for group view
+            async getUsersData(usernames) {
+                const usersData = {};
+                for (const username of usernames) {
+                    try {
+                        const userDoc = await getDoc(doc(db, "users", username));
+                        if (userDoc.exists()) {
+                            usersData[username] = userDoc.data();
+                        }
+                    } catch (error) {
+                        console.error(`Error getting user data for ${username}:`, error);
+                    }
+                }
+                return usersData;
+            },
+
+            // Workout comment broadcast
+            async broadcastWorkoutComment(username, comment, groups) {
+                try {
+                    for (const group of groups) {
+                        await this.sendMessage(username, `🏋️ Workout update: ${comment}`, group);
+                    }
+                    return { success: true };
+                } catch (error) {
+                    console.error("Error broadcasting comment:", error);
+                    return { success: false, error: "Failed to broadcast comment" };
+                }
+            }
+        };
+        
+        console.log("Firebase initialized successfully!");
+    </script>
+
+    <script>
+        // Global variables
+        let currentAction = 'Log In';
+        let currentDay = 'Mon';
+        let currentUser = null;
+        let currentGroupView = null;
+        let workouts = { Mon: [], Tue: [], Wed: [], Thu: [], Fri: [], Sat: [], Sun: [] };
+
+        // Initialize time dropdown
+        function initializeTimeDropdown() {
+            const timeSelect = document.getElementById('timeSelect');
+            timeSelect.innerHTML = '';
+            
+            for (let hour = 0; hour < 24; hour++) {
+                for (let minute of ['00', '30']) {
+                    const timeString = `${hour.toString().padStart(2, '0')}:${minute}`;
+                    const option = document.createElement('option');
+                    option.value = timeString;
+                    option.textContent = timeString;
+                    timeSelect.appendChild(option);
+                }
+            }
+        }
+
+        // Setup tabs for routine creation
+        function setupTabs() {
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    // Update tab styles
+                    document.querySelectorAll('.tab-btn').forEach(t => {
+                        t.classList.remove('bg-indigo-700', 'text-white');
+                        t.classList.add('bg-gray-300', 'text-gray-700');
+                    });
+                    this.classList.remove('bg-gray-300', 'text-gray-700');
+                    this.classList.add('bg-indigo-700', 'text-white');
+                    
+                    const day = this.dataset.day;
+                    currentDay = day;
+                    
+                    if (day === 'Notes') {
+                        document.getElementById('workout-content').classList.add('hidden');
+                        document.getElementById('notes-content').classList.remove('hidden');
+                        loadNotes();
+                    } else {
+                        document.getElementById('workout-content').classList.remove('hidden');
+                        document.getElementById('notes-content').classList.add('hidden');
+                        document.getElementById('day-title').textContent = `${day} Workout!`;
+                        updateWorkoutsList();
+                    }
+                });
+            });
+        }
+
+        // Update workouts list display
+        function updateWorkoutsList() {
+            const workoutsList = document.getElementById('workoutsList');
+            const dayWorkouts = workouts[currentDay] || [];
+            
+            if (dayWorkouts.length === 0) {
+                workoutsList.innerHTML = '<div class="text-indigo-500 text-center py-8">No workouts added yet</div>';
+            } else {
+                workoutsList.innerHTML = dayWorkouts.map((workout, index) => `
+                    <div class="flex justify-between items-center p-2 mb-2 bg-indigo-50 rounded border border-indigo-200">
+                        <div>
+                            <div class="font-semibold text-indigo-800">${workout.bodyPart}</div>
+                            <div class="text-sm text-indigo-600">${workout.details}</div>
+                            <div class="text-xs text-indigo-400">${workout.time}</div>
+                        </div>
+                        <button onclick="removeWorkoutAtIndex(${index})" class="text-red-600 hover:text-red-800 text-sm">
+                            Remove
+                        </button>
+                    </div>
+                `).join('');
+            }
+            
+            // Update checkbox
+            document.getElementById('workoutsCheckbox').checked = dayWorkouts.length > 0;
+        }
+
+        // Add workout to current day
+        function addWorkout() {
+            const bodyPart = document.getElementById('bodyPartInput').value.trim();
+            const details = document.getElementById('workoutDetailsInput').value.trim();
+            const time = document.getElementById('timeSelect').value;
+            
+            if (!bodyPart || !details) {
+                alert('Please fill in body part and workout details');
+                return;
+            }
+            
+            if (!workouts[currentDay]) {
+                workouts[currentDay] = [];
+            }
+            
+            workouts[currentDay].push({
+                bodyPart,
+                details,
+                time
+            });
+            
+            // Clear inputs
+            document.getElementById('bodyPartInput').value = '';
+            document.getElementById('workoutDetailsInput').value = '';
+            
+            updateWorkoutsList();
+        }
+
+        // Remove workout from current day
+        function removeWorkout() {
+            if (workouts[currentDay] && workouts[currentDay].length > 0) {
+                workouts[currentDay].pop();
+                updateWorkoutsList();
+            }
+        }
+
+        // Remove specific workout by index
+        function removeWorkoutAtIndex(index) {
+            if (workouts[currentDay] && workouts[currentDay][index]) {
+                workouts[currentDay].splice(index, 1);
+                updateWorkoutsList();
+            }
+        }
+
+        // Load notes into textarea
+        function loadNotes() {
+            if (currentUser && currentUser.notes) {
+                document.getElementById('notes-textarea').value = currentUser.notes;
+            } else {
+                document.getElementById('notes-textarea').value = '';
+            }
+        }
+
+        // Save routine to Firebase
+        async function saveRoutine() {
+            if (!currentUser) return;
+            
+            try {
+                const result = await window.firebaseDB.saveUserRoutine(currentUser.username, workouts);
+                if (result.success) {
+                    alert('Routine saved successfully!');
+                    // Update current user data
+                    const freshData = await window.firebaseDB.getUserData(currentUser.username);
+                    currentUser.routine = freshData.routine;
+                } else {
+                    alert(result.error || 'Failed to save routine');
+                }
+            } catch (error) {
+                console.error('Error saving routine:', error);
+                alert('Failed to save routine');
+            }
+        }
+
+        // Save notes to Firebase
+        async function saveNotes() {
+            if (!currentUser) return;
+            
+            const notes = document.getElementById('notes-textarea').value;
+            try {
+                const result = await window.firebaseDB.updateUserNotes(currentUser.username, notes);
+                if (result.success) {
+                    alert('Notes saved successfully!');
+                    currentUser.notes = notes;
+                } else {
+                    alert(result.error || 'Failed to save notes');
+                }
+            } catch (error) {
+                console.error('Error saving notes:', error);
+                alert('Failed to save notes');
+            }
+        }
+
+        // Go to home window
+        function goToHome() {
+            if (currentUser) {
+                showWindow('window4');
+                setupHomeWindow(currentUser, currentUser.username);
+            }
+        }
+
+        // Time to next workout calculation
+        function calculateNextWorkout(userRoutine) {
+            const now = new Date();
+            const today = now.getDay(); // 0 = Sunday, 1 = Monday, etc.
+            const currentTime = now.getHours() * 60 + now.getMinutes(); // minutes since midnight
+            
+            const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+            let nextWorkout = null;
+            
+            // Check next 7 days starting from today
+            for (let i = 0; i < 7; i++) {
+                const dayIndex = (today + i) % 7;
+                const dayName = days[dayIndex];
+                const dayWorkouts = userRoutine[dayName] || [];
+                
+                if (dayWorkouts.length > 0) {
+                    for (const workout of dayWorkouts) {
+                        if (workout.time && workout.time !== '_ _:_ _') {
+                            const [hours, minutes] = workout.time.split(':').map(Number);
+                            const workoutTime = hours * 60 + minutes;
+                            
+                            // If it's today, check if workout time is in future
+                            if (i === 0 && workoutTime > currentTime) {
+                                nextWorkout = {
+                                    day: dayName,
+                                    time: workout.time,
+                                    workout: workout.details,
+                                    daysFromNow: 0,
+                                    minutesFromNow: workoutTime - currentTime
+                                };
+                                break;
+                            }
+                            // If it's a future day
+                            else if (i > 0) {
+                                nextWorkout = {
+                                    day: dayName,
+                                    time: workout.time,
+                                    workout: workout.details,
+                                    daysFromNow: i,
+                                    minutesFromNow: (i * 24 * 60) + (workoutTime - currentTime)
+                                };
+                                break;
+                            }
+                        }
+                    }
+                    if (nextWorkout) break;
+                }
+            }
+            
+            return nextWorkout || {
+                day: 'Mon',
+                time: '07:00',
+                workout: 'No workouts scheduled',
+                daysFromNow: 0,
+                minutesFromNow: 0
+            };
+        }
+
+        // Update countdown timer with real data
+        function updateCountdownTimer(userRoutine) {
+            const nextWorkout = calculateNextWorkout(userRoutine);
+            
+            const days = Math.floor(nextWorkout.minutesFromNow / (24 * 60));
+            const hours = Math.floor((nextWorkout.minutesFromNow % (24 * 60)) / 60);
+            const minutes = nextWorkout.minutesFromNow % 60;
+            
+            document.getElementById('countdown-days').textContent = days;
+            document.getElementById('countdown-hours').textContent = hours;
+            document.getElementById('countdown-minutes').textContent = minutes;
+            document.getElementById('next-workout-name').textContent = nextWorkout.workout;
+            
+            const dayNames = { Mon: 'Monday', Tue: 'Tuesday', Wed: 'Wednesday', Thu: 'Thursday', Fri: 'Friday', Sat: 'Saturday', Sun: 'Sunday' };
+            document.getElementById('workout-time').textContent = `${dayNames[nextWorkout.day]} at ${nextWorkout.time}`;
+        }
+
+        // Helper function to get today's workout
+        function getTodaysWorkout(routine) {
+            const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+            const today = days[new Date().getDay()];
+            return routine[today] || [];
+        }
+
+        // Group Details Window Implementation
+        async function loadGroupDetails(groupName) {
+            currentGroupView = groupName;
+            const scrollContent = document.getElementById('content-scroll');
+            const dynamicInput = document.getElementById('dynamic-input');
+            
+            try {
+                // Get group data
+                const groupData = await window.firebaseDB.getGroupData(groupName);
+                if (!groupData) {
+                    scrollContent.innerHTML = '<div class="text-white text-center py-8">Group not found</div>';
+                    return;
+                }
+                
+                // Get all members data
+                const usersData = await window.firebaseDB.getUsersData(groupData.members);
+                
+                // Calculate member rankings
+                const today = new Date().toISOString().split('T')[0];
+                const membersWithStats = groupData.members.map(username => {
+                    const user = usersData[username];
+                    if (!user) return null;
+                    
+                    const todayWorkout = user.workoutHistory?.[today] || { completed: false, workoutsDone: [] };
+                    const todaysRoutine = getTodaysWorkout(user.routine || {});
+                    
+                    // Calculate completion rate
+                    const workoutHistory = user.workoutHistory || {};
+                    const completedWorkouts = Object.values(workoutHistory).filter(w => w.completed).length;
+                    const totalTrackedDays = Math.max(Object.keys(workoutHistory).length, 1);
+                    const completionRate = completedWorkouts / totalTrackedDays;
+                    
+                    return {
+                        username,
+                        todaysWorkouts: todaysRoutine.map(w => w.bodyPart),
+                        completedWorkouts: todayWorkout.workoutsDone || [],
+                        isCompleted: todayWorkout.completed || false,
+                        completionRate: completionRate,
+                        currentStreak: user.stats?.currentStreak || 0,
+                        // Ranking score: completion rate (60%) + streak (40%)
+                        score: (completionRate * 60) + ((user.stats?.currentStreak || 0) * 40)
+                    };
+                }).filter(member => member !== null);
+                
+                // Sort by score (descending)
+                membersWithStats.sort((a, b) => b.score - a.score);
+                
+                scrollContent.innerHTML = `
+                    <div class="space-y-4 text-white">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-xl font-bold">${groupName} - Members</h3>
+                            <button onclick="loadGroupsContent()" class="bg-stone-600 hover:bg-stone-700 text-white px-4 py-2 rounded-lg transition duration-300 red-accent">
+                                ← Back to Groups
+                            </button>
+                        </div>
+                        <div class="border border-red-600 rounded-lg h-64 overflow-y-auto p-3 bg-indigo-800/20">
+                            <div class="space-y-3">
+                                ${membersWithStats.map((member, index) => `
+                                    <div class="${index === 0 ? 'leader-top' : 'bg-indigo-800/30'} p-4 rounded-lg border border-red-600 transition-all duration-300">
+                                        <div class="flex items-center justify-between">
+                                            <div class="flex items-center space-x-3">
+                                                ${index === 0 ? '<span class="text-xl">👑</span>' : ''}
+                                                <div>
+                                                    <div class="font-semibold text-lg">${member.username}</div>
+                                                    <div class="text-sm ${index === 0 ? 'text-stone-200' : 'text-indigo-200'}">
+                                                        Today's Workouts: ${member.todaysWorkouts.join(', ') || 'Rest day'}
+                                                    </div>
+                                                    <div class="text-xs ${index === 0 ? 'text-stone-300' : 'text-indigo-300'}">
+                                                        Completion: ${Math.round(member.completionRate * 100)}% | Streak: ${member.currentStreak} days
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="flex items-center space-x-2">
+                                                <input type="checkbox" ${member.isCompleted ? 'checked' : ''} disabled 
+                                                    class="w-5 h-5 text-red-600 bg-stone-100 border-red-300 rounded focus:ring-red-500">
+                                                <span class="text-sm ${index === 0 ? 'text-stone-200' : 'text-indigo-200'}">
+                                                    ${member.isCompleted ? 'Completed' : 'Pending'}
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } catch (error) {
+                console.error('Error loading group details:', error);
+                scrollContent.innerHTML = '<div class="text-red-400 text-center py-8">Error loading group details</div>';
+            }
+            
+            dynamicInput.innerHTML = `
+                <button onclick="leaveGroup('${groupName}')" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg transition duration-300 red-accent">
+                    Leave Group
+                </button>
+            `;
+        }
+
+        // Modified Groups Tab Content to handle clicks
+        async function loadGroupsContent() {
+            currentGroupView = null;
+            const scrollContent = document.getElementById('content-scroll');
+            const dynamicInput = document.getElementById('dynamic-input');
+            
+            if (!currentUser || !currentUser.groups) {
+                scrollContent.innerHTML = '<div class="text-white text-center py-8">No groups joined yet</div>';
+                dynamicInput.innerHTML = '';
+                return;
+            }
+            
+            try {
+                scrollContent.innerHTML = `
+                    <div class="space-y-4 text-white">
+                        <h3 class="text-xl font-bold mb-4">Your Groups</h3>
+                        <div class="border border-red-600 rounded-lg h-64 overflow-y-auto p-3 bg-indigo-800/20">
+                            ${currentUser.groups.map(group => `
+                                <button onclick="loadGroupDetails('${group}')" class="w-full text-left p-3 mb-2 bg-indigo-800/30 hover:bg-indigo-700/50 rounded-lg transition duration-300 group-item border border-indigo-600">
+                                    <div class="font-semibold">${group}</div>
+                                    <div class="text-sm text-indigo-200">Click to view members and rankings</div>
+                                </button>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            } catch (error) {
+                console.error('Error loading groups:', error);
+                scrollContent.innerHTML = '<div class="text-red-400 text-center py-8">Error loading groups</div>';
+            }
+
+            dynamicInput.innerHTML = `
+                <div class="flex-1">
+                    <input type="text" id="new-group-name" placeholder="Enter group name to join..." 
+                           class="w-full px-3 py-2 border border-red-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white">
+                </div>
+                <button onclick="createGroup()" class="bg-stone-600 hover:bg-stone-700 text-white px-4 py-2 rounded-lg transition duration-300 red-accent">
+                    Create Group
+                </button>
+                <button onclick="joinGroup()" class="bg-indigo-700 hover:bg-indigo-800 text-white px-4 py-2 rounded-lg transition duration-300 red-accent">
+                    Join Group
+                </button>
+            `;
+        }
+
+        // Create group function
+        async function createGroup() {
+            const groupName = document.getElementById('new-group-name').value.trim();
+            if (!groupName) {
+                alert('Please enter a group name');
+                return;
+            }
+
+            try {
+                const result = await window.firebaseDB.createGroup(currentUser.username, groupName);
+                if (result.success) {
+                    alert(`Successfully created ${groupName}!`);
+                    // Refresh user data
+                    const freshUserData = await window.firebaseDB.getUserData(currentUser.username);
+                    currentUser = { ...freshUserData, username: currentUser.username };
+                    loadGroupsContent();
+                    document.getElementById('new-group-name').value = '';
+                } else {
+                    alert(result.error || 'Failed to create group');
+                }
+            } catch (error) {
+                console.error('Error creating group:', error);
+                alert('Failed to create group');
+            }
+        }
+
+        // Join group function
+        async function joinGroup() {
+            const groupName = document.getElementById('new-group-name').value.trim();
+            if (!groupName) {
+                alert('Please enter a group name');
+                return;
+            }
+
+            try {
+                const result = await window.firebaseDB.joinGroup(currentUser.username, groupName);
+                if (result.success) {
+                    alert(`Successfully joined ${groupName}!`);
+                    // Refresh user data
+                    const freshUserData = await window.firebaseDB.getUserData(currentUser.username);
+                    currentUser = { ...freshUserData, username: currentUser.username };
+                    loadGroupsContent();
+                    document.getElementById('new-group-name').value = '';
+                } else {
+                    alert(result.error || 'Failed to join group');
+                }
+            } catch (error) {
+                console.error('Error joining group:', error);
+                alert('Failed to join group');
+            }
+        }
+
+        // Leave group function
+        async function leaveGroup(groupName) {
+            if (!confirm(`Are you sure you want to leave ${groupName}?`)) {
+                return;
+            }
+
+            try {
+                const result = await window.firebaseDB.leaveGroup(currentUser.username, groupName);
+                if (result.success) {
+                    alert(`Successfully left ${groupName}!`);
+                    // Refresh user data
+                    const freshUserData = await window.firebaseDB.getUserData(currentUser.username);
+                    currentUser = { ...freshUserData, username: currentUser.username };
+                    loadGroupsContent();
+                } else {
+                    alert(result.error || 'Failed to leave group');
+                }
+            } catch (error) {
+                console.error('Error leaving group:', error);
+                alert('Failed to leave group');
+            }
+        }
+
+        // Save workout comment with broadcast
+        async function saveWorkoutComment() {
+            const comment = document.getElementById('workout-comment').value.trim();
+            if (!comment) {
+                alert('Please enter a comment');
+                return;
+            }
+
+            try {
+                // Mark workout as completed
+                const today = new Date().toISOString().split('T')[0];
+                const todaysWorkouts = getTodaysWorkout(currentUser.routine || {});
+                const workoutData = {
+                    completed: true,
+                    workoutsDone: todaysWorkouts.map(w => w.bodyPart),
+                    comment: comment
+                };
+
+                const result = await window.firebaseDB.markWorkoutComplete(currentUser.username, workoutData);
+                if (!result.success) {
+                    alert(result.error || 'Failed to save workout');
+                    return;
+                }
+                
+                // Broadcast to all user's groups
+                if (currentUser.groups && currentUser.groups.length > 0) {
+                    await window.firebaseDB.broadcastWorkoutComment(currentUser.username, comment, currentUser.groups);
+                }
+
+                alert('Workout completed and comment broadcasted!');
+                document.getElementById('workout-comment').value = '';
+                
+                // Refresh user data
+                const freshUserData = await window.firebaseDB.getUserData(currentUser.username);
+                currentUser = { ...freshUserData, username: currentUser.username };
+            } catch (error) {
+                console.error('Error saving workout comment:', error);
+                alert('Failed to save workout');
+            }
+        }
+
+        // Save user notes
+        async function saveUserNotes() {
+            const notesText = document.getElementById('notes-textarea').value;
+            try {
+                const result = await window.firebaseDB.updateUserNotes(currentUser.username, notesText);
+                if (result.success) {
+                    alert('Notes saved successfully!');
+                    currentUser.notes = notesText;
+                } else {
+                    alert(result.error || 'Failed to save notes');
+                }
+            } catch (error) {
+                console.error('Error saving notes:', error);
+                alert('Failed to save notes');
+            }
+        }
+
+        // Send chat message
+        async function sendMessage() {
+            const messageInput = document.getElementById('message-input');
+            const message = messageInput.value.trim();
+            const chatTarget = document.getElementById('chat-target').value;
+            
+            if (!message) {
+                alert('Please enter a message');
+                return;
+            }
+            
+            if (message.length > 100) {
+                alert('Message too long (max 100 characters)');
+                return;
+            }
+
+            // Validate that user can send to this target
+            if (chatTarget !== "all" && (!currentUser.groups || !currentUser.groups.includes(chatTarget))) {
+                alert('You are not a member of this group');
+                return;
+            }
+
+            try {
+                const result = await window.firebaseDB.sendMessage(currentUser.username, message, chatTarget);
+                if (result.success) {
+                    messageInput.value = '';
+                    // Reload chat messages
+                    loadChatContent();
+                } else {
+                    alert(result.error || 'Failed to send message');
+                }
+            } catch (error) {
+                console.error('Error sending message:', error);
+                alert('Failed to send message');
+            }
+        }
+
+        // Load chat messages
+        async function loadChatContent() {
+            const scrollContent = document.getElementById('content-scroll');
+            const chatTarget = document.getElementById('chat-target').value;
+            
+            try {
+                const messages = await window.firebaseDB.getChatMessages(
+                    chatTarget, 
+                    currentUser?.groups || []
+                );
+                
+                // Sort messages by timestamp
+                messages.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
+                
+                scrollContent.innerHTML = `
+                    <div class="space-y-3" id="chat-messages">
+                        ${messages.map(msg => `
+                            <div class="${msg.username === currentUser.username ? 'user-message' : 'other-message'} p-3 rounded-lg">
+                                <div class="font-semibold">${msg.username}</div>
+                                <div>${msg.message}</div>
+                                <div class="text-xs text-gray-500">${new Date(msg.timestamp).toLocaleTimeString()}</div>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+                
+                // Scroll to bottom
+                scrollContent.scrollTop = scrollContent.scrollHeight;
+            } catch (error) {
+                console.error('Error loading chat:', error);
+                scrollContent.innerHTML = '<div class="text-red-400 text-center py-8">Error loading messages</div>';
+            }
+        }
+
+        // Authentication handler
+        async function handleAuth() {
+            const username = document.getElementById('usernameInput').value.trim();
+            const password = document.getElementById('passwordInput').value;
+            const messageEl = document.getElementById('message');
+            const actionBtn = document.getElementById('actionBtn');
+            
+            if (!username || !password) {
+                showMessage('Please fill in all fields', 'error');
+                return;
+            }
+            
+            actionBtn.textContent = 'Processing...';
+            actionBtn.disabled = true;
+            
+            try {
+                let result;
+                
+                if (currentAction === 'Log In') {
+                    result = await window.firebaseDB.loginUser(username, password);
+                } else {
+                    result = await window.firebaseDB.registerUser(username, password);
+                }
+                
+                if (result.success) {
+                    showMessage(`${currentAction} successful! Welcome, ${username}`, 'success');
+                    actionBtn.textContent = 'Success!';
+                    actionBtn.classList.remove('bg-stone-600', 'hover:bg-stone-700');
+                    actionBtn.classList.add('bg-stone-700');
+                    
+                    // Load fresh user data from Firebase
+                    const freshUserData = await window.firebaseDB.getUserData(username);
+                    currentUser = { ...freshUserData, username: username };
+                    
+                    // Load routine data if it exists
+                    if (freshUserData.routine) {
+                        workouts = { ...workouts, ...freshUserData.routine };
+                    }
+                    
+                    setTimeout(() => {
+                        if (currentAction === 'Join') {
+                            showWindow('window3');
+                        } else {
+                            showWindow('window4');
+                            setupHomeWindow(currentUser, username);
+                        }
+                    }, 1000);
+                    
+                } else {
+                    showMessage(result.error, 'error');
+                    actionBtn.disabled = false;
+                    actionBtn.textContent = currentAction;
+                    actionBtn.classList.remove('bg-stone-700');
+                    actionBtn.classList.add('bg-stone-600', 'hover:bg-stone-700');
+                }
+                
+            } catch (error) {
+                console.error('Authentication error:', error);
+                showMessage('An error occurred. Please try again.', 'error');
+                actionBtn.disabled = false;
+                actionBtn.textContent = currentAction;
+                actionBtn.classList.remove('bg-stone-700');
+                actionBtn.classList.add('bg-stone-600', 'hover:bg-stone-700');
+            }
+        }
+
+        // Update current date display
+        function updateCurrentDate() {
+            const now = new Date();
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            document.getElementById('current-date').textContent = now.toLocaleDateString('en-US', options);
+        }
+
+        // Function to update chat dropdown with user's groups
+        function updateChatDropdown() {
+            const chatTarget = document.getElementById('chat-target');
+            if (!chatTarget || !currentUser) return;
+            
+            // Save current selection
+            const currentSelection = chatTarget.value;
+            
+            // Clear existing group options (keep "all")
+            chatTarget.innerHTML = '<option value="all">Global Chat</option>';
+            
+            // Add user's groups
+            if (currentUser.groups && currentUser.groups.length > 0) {
+                currentUser.groups.forEach(group => {
+                    const option = document.createElement('option');
+                    option.value = group;
+                    option.textContent = group;
+                    chatTarget.appendChild(option);
+                });
+                
+                // Restore previous selection if it's still valid, otherwise select first group
+                const validOptions = ['all', ...currentUser.groups];
+                if (validOptions.includes(currentSelection)) {
+                    chatTarget.value = currentSelection;
+                } else if (currentUser.groups.length > 0) {
+                    chatTarget.value = currentUser.groups[0];
+                }
+            }
+            
+            // Add event listener to reload chat when selection changes
+            chatTarget.onchange = loadChatContent;
+        }
+
+        // Home Window Functions
+        function setupHomeWindow(userData, username) {
+            currentUser = { ...userData, username };
+            
+            // Update user info displays
+            document.getElementById('sidebar-username').textContent = username;
+            document.getElementById('bottom-username').textContent = `Logged in as: ${username}`;
+            
+            // Setup sidebar tabs
+            setupSidebarTabs();
+            
+            // Initialize chat dropdown with user's groups
+            updateChatDropdown();
+            
+            // Start countdown timer with real data
+            updateCountdownTimer(currentUser.routine || {});
+            
+            // Update current date
+            updateCurrentDate();
+            
+            // Load initial tab content
+            updateMainContent('chat');
+        }
+
+        function setupSidebarTabs() {
+            document.querySelectorAll('.sidebar-tab').forEach(tab => {
+                tab.addEventListener('click', function() {
+                    // Update tab styles
+                    document.querySelectorAll('.sidebar-tab').forEach(t => {
+                        t.classList.remove('bg-indigo-700');
+                        t.classList.add('bg-indigo-900', 'hover:bg-indigo-700');
+                    });
+                    this.classList.remove('bg-indigo-900', 'hover:bg-indigo-700');
+                    this.classList.add('bg-indigo-700');
+                    
+                    const tabName = this.dataset.tab;
+                    updateMainContent(tabName);
+                });
+            });
+        }
+
+        function updateMainContent(tab) {
+            const titleElement = document.getElementById('current-tab-title');
+            const scrollContent = document.getElementById('content-scroll');
+            const dynamicInput = document.getElementById('dynamic-input');
+            const chatControls = document.getElementById('chat-controls');
+            
+            // Show/hide chat controls based on tab
+            if (tab === 'chat') {
+                chatControls.classList.remove('hidden');
+            } else {
+                chatControls.classList.add('hidden');
+            }
+            
+            // Update title
+            titleElement.textContent = getTabTitle(tab);
+            
+            // Load appropriate content
+            switch(tab) {
+                case 'chat':
+                    loadChatContent();
+                    break;
+                case 'groups':
+                    loadGroupsContent();
+                    break;
+                case 'workout':
+                    loadWorkoutContent();
+                    break;
+                case 'routine':
+                    showWindow('window3');
+                    return;
+                case 'notes':
+                    loadNotesContent();
+                    break;
+            }
+        }
+
+        function getTabTitle(tab) {
+            const titles = {
+                'chat': 'Chat',
+                'groups': 'Groups',
+                'workout': "Today's Workout",
+                'notes': 'Notes'
+            };
+            return titles[tab] || tab;
+        }
+
+        // Today's Workout Tab Content
+        function loadWorkoutContent() {
+            const scrollContent = document.getElementById('content-scroll');
+            const dynamicInput = document.getElementById('dynamic-input');
+            
+            const todaysWorkouts = getTodaysWorkout(currentUser.routine || {});
+            const today = new Date().toISOString().split('T')[0];
+            const todayWorkout = currentUser.workoutHistory?.[today] || { completed: false, workoutsDone: [] };
+            
+            if (todaysWorkouts.length === 0) {
+                scrollContent.innerHTML = `
+                    <div class="text-white text-center py-8">
+                        <h3 class="text-xl font-bold mb-4">No Workout Scheduled for Today</h3>
+                        <p class="text-indigo-200">Go to Routine Adjustment to set up your workout schedule</p>
+                    </div>
+                `;
+            } else {
+                scrollContent.innerHTML = `
+                    <div class="space-y-6 text-white">
+                        <h3 class="text-xl font-bold mb-4">Today's Workout</h3>
+                        
+                        <div class="space-y-4">
+                            ${todaysWorkouts.map(workout => `
+                                <div class="bg-indigo-800/30 p-4 rounded-lg border border-indigo-600">
+                                    <div class="flex justify-between items-center">
+                                        <div>
+                                            <div class="font-semibold text-lg">${workout.bodyPart}</div>
+                                            <div class="text-indigo-200">${workout.details}</div>
+                                            <div class="text-sm text-indigo-300">Time: ${workout.time}</div>
+                                        </div>
+                                        <div class="flex items-center space-x-2">
+                                            <input type="checkbox" ${todayWorkout.workoutsDone.includes(workout.bodyPart) ? 'checked' : ''} disabled 
+                                                   class="w-5 h-5 text-red-600 bg-stone-100 border-red-300 rounded focus:ring-red-500">
+                                            <span class="text-sm ${todayWorkout.workoutsDone.includes(workout.bodyPart) ? 'text-green-400' : 'text-indigo-200'}">
+                                                ${todayWorkout.workoutsDone.includes(workout.bodyPart) ? 'Completed' : 'Pending'}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                        
+                        <div class="flex items-center space-x-3 mb-6">
+                            <input type="checkbox" id="workout-done" ${todayWorkout.completed ? 'checked' : ''} 
+                                   class="w-5 h-5 text-red-600 bg-stone-100 border-red-300 rounded focus:ring-red-500">
+                            <label for="workout-done" class="text-lg font-medium">Mark as completed</label>
+                        </div>
+                    </div>
+                `;
+            }
+
+            dynamicInput.innerHTML = `
+                <div class="flex-1">
+                    <input type="text" id="workout-comment" placeholder="Add a comment about your workout..." 
+                           class="w-full px-3 py-2 border border-red-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white">
+                </div>
+                <button onclick="saveWorkoutComment()" class="bg-stone-600 hover:bg-stone-700 text-white px-4 py-2 rounded-lg transition duration-300 red-accent">
+                    Save Comment
+                </button>
+            `;
+        }
+
+        // Notes Tab Content
+        function loadNotesContent() {
+            const scrollContent = document.getElementById('content-scroll');
+            const dynamicInput = document.getElementById('dynamic-input');
+            
+            scrollContent.innerHTML = `
+                <div class="text-white">
+                    <h3 class="text-xl font-bold mb-4">Your Notes</h3>
+                    <textarea id="notes-textarea" placeholder="Write your notes here..." 
+                              class="w-full h-64 px-3 py-2 border border-red-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-stone-800 bg-stone-200">${currentUser.notes || ''}</textarea>
+                </div>
+            `;
+
+            dynamicInput.innerHTML = `
+                <button onclick="saveUserNotes()" class="bg-stone-600 hover:bg-stone-700 text-white px-6 py-2 rounded-lg transition duration-300 red-accent">
+                    Save Notes
+                </button>
+            `;
+        }
+
+        function showMessage(message, type) {
+            const messageEl = document.getElementById('message');
+            messageEl.textContent = message;
+            messageEl.className = 'text-sm min-h-5 ' + (type === 'error' ? 'text-red-400' : 'text-green-400');
+        }
+
+        function showWindow(windowId, action = null) {
+            // Hide all windows
+            document.querySelectorAll('.window').forEach(window => {
+                window.classList.add('hidden');
+                window.classList.remove('active');
+            });
+            
+            // Show target window
+            const targetWindow = document.getElementById(windowId);
+            targetWindow.classList.remove('hidden');
+            setTimeout(() => targetWindow.classList.add('active'), 50);
+            
+            // Update form if it's window2
+            if (windowId === 'window2' && action) {
+                currentAction = action;
+                document.getElementById('formTitle').textContent = action;
+                
+                // Get the action button and ensure it's properly reset
+                const actionBtn = document.getElementById('actionBtn');
+                
+                // Remove any existing event listeners to prevent duplicates
+                actionBtn.replaceWith(actionBtn.cloneNode(true));
+                
+                // Get the fresh button reference
+                const freshActionBtn = document.getElementById('actionBtn');
+                
+                // Set up the button completely
+                freshActionBtn.textContent = action;
+                freshActionBtn.disabled = false;
+                freshActionBtn.classList.remove('bg-stone-700');
+                freshActionBtn.classList.add('bg-stone-600', 'hover:bg-stone-700');
+                
+                // ALWAYS attach the event handler
+                freshActionBtn.onclick = handleAuth;
+                
+                document.getElementById('message').textContent = '';
+                
+                // Reset form fields
+                if (action === 'Log In' || action === 'Join') {
+                    document.getElementById('usernameInput').value = '';
+                    document.getElementById('passwordInput').value = '';
+                }
+            }
+            
+            // Initialize window3 if showing
+            if (windowId === 'window3') {
+                initializeTimeDropdown();
+                setupTabs();
+                updateWorkoutsList();
+                if (currentUser && currentUser.routine) {
+                    workouts = { ...workouts, ...currentUser.routine };
+                }
+            }
+        }
+
+        function signOut() {
+            currentUser = null;
+            currentGroupView = null;
+            workouts = { Mon: [], Tue: [], Wed: [], Thu: [], Fri: [], Sat: [], Sun: [] };
+            
+            // Force a complete reset of the login form
+            const actionBtn = document.getElementById('actionBtn');
+            if (actionBtn) {
+                // Clone and replace to remove all event listeners
+                actionBtn.replaceWith(actionBtn.cloneNode(true));
+                
+                // Reset the fresh button
+                const freshBtn = document.getElementById('actionBtn');
+                freshBtn.textContent = 'Log In';
+                freshBtn.disabled = false;
+                freshBtn.classList.remove('bg-stone-700');
+                freshBtn.classList.add('bg-stone-600', 'hover:bg-stone-700');
+                freshBtn.onclick = handleAuth;
+            }
+            
+            // Clear any form data
+            const usernameInput = document.getElementById('usernameInput');
+            const passwordInput = document.getElementById('passwordInput');
+            const messageEl = document.getElementById('message');
+            
+            if (usernameInput) usernameInput.value = '';
+            if (passwordInput) passwordInput.value = '';
+            if (messageEl) messageEl.textContent = '';
+            
+            showWindow('window1');
+        }
+
+        // Initialize the app
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeTimeDropdown();
+            console.log('GYMBRO App Initialized');
+        });
+    </script>
+</body>
+</html>
